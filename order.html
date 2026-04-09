@@ -14,17 +14,14 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
-        
-        /* สไตล์ปุ่มเพิ่มม้วนฟิล์ม */
         .film-entry { display: flex; gap: 8px; align-items: center; }
         .btn-action { padding: 10px 15px; cursor: pointer; font-family: 'Special Elite'; font-size: 14px; border: none; transition: 0.3s; }
         .add-btn { background: #5a554f; color: white; width: 100%; margin-bottom: 20px; }
         .remove-btn { background: #a34b4b; color: white; height: 45px; margin-bottom: 10px; }
-
         button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 18px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; margin-top: 10px; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
-        .chat-btn { background: #4a453f; color: white; padding: 12px; text-decoration: none; display: block; margin-top: 15px; }
+        .chat-btn { background: #0084ff; color: white; padding: 15px; text-decoration: none; display: block; margin-top: 15px; font-weight: bold; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -35,9 +32,7 @@
 
     <div class="price-tag">
         <strong>PRICE LIST:</strong><br>
-        • Color C-41 / ECN-2: 130.- / ม้วน<br>
-        • Black & White: 150.- / ม้วน<br>
-        • ค่าส่งเนกาทีฟกลับ: เริ่มต้น 30.-
+        (กำลังปรับปรุงราคาเร็วๆ นี้ครับ)
     </div>
 
     <form id="orderForm">
@@ -70,13 +65,12 @@
     <div id="successBox">
         <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
         <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
-        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงินนะครับ</p>
-        <a href="https://ig.me/m/the.analog.nomad" class="chat-btn">CLICK TO CHAT (แจ้งโอนเงิน)</a>
+        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงิน<br>และส่งสลิปโอนเงินทางเพจ Facebook นะครับ</p>
+        <a href="https://m.me/61575451919271" target="_blank" class="chat-btn">ทักแชทแจ้งโอนเงิน (Messenger)</a>
     </div>
 </div>
 
 <script>
-    // ฟังก์ชันเพิ่มช่องกรอกฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
@@ -97,7 +91,6 @@
         btn.disabled = true;
         btn.innerText = "SENDING...";
 
-        // รวมชื่อฟิล์มทุกช่องเข้าด้วยกัน แยกบรรทัดใหม่
         const filmInputs = document.getElementsByClassName('film-name');
         let filmDetails = "";
         for (let i = 0; i < filmInputs.length; i++) {
