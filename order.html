@@ -14,39 +14,27 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
-        
         .film-entry { display: flex; gap: 8px; align-items: center; }
         .btn-action { padding: 10px 15px; cursor: pointer; font-family: 'Special Elite'; font-size: 14px; border: none; transition: 0.3s; }
         .add-btn { background: #5a554f; color: white; width: 100%; margin-bottom: 20px; }
         .remove-btn { background: #a34b4b; color: white; height: 45px; margin-bottom: 10px; }
-
         button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 18px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; margin-top: 10px; }
         button:disabled { background: #ccc; cursor: not-allowed; }
-        
-        /* ปุ่มตรวจสอบสถานะ (สีสไตล์นัท) */
         .track-link-btn { background: #4a453f; color: white; padding: 15px; text-decoration: none; display: block; text-align: center; margin-top: 15px; font-size: 16px; border: 1px solid #333; }
-        
         #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
         .fb-btn { background: #1877F2; color: white; padding: 15px; text-decoration: none; display: block; margin-top: 15px; font-weight: bold; border-radius: 5px; font-family: 'Sarabun'; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <h1>THE ANALOG NOMAD</h1>
     <p style="text-align: center; font-size: 11px; margin-top: -10px; margin-bottom: 20px;">— ORDER FORM —</p>
-
-    <div class="price-tag">
-        <strong>PRICE LIST:</strong><br>
-        (กำลังปรับปรุงราคาเร็วๆ นี้ครับ)
-    </div>
-
+    <div class="price-tag"><strong>PRICE LIST:</strong><br>(กำลังปรับปรุงราคาเร็วๆ นี้ครับ)</div>
     <form id="orderForm">
         <div class="form-group">
             <label>ORDER ID (ดูจากเลขบนซองซิปล็อค)</label>
             <input type="text" id="orderId" placeholder="เช่น A001" required>
         </div>
-
         <div class="form-group">
             <label>ชื่อฟิล์ม (ระบุทีละม้วน)</label>
             <div id="filmList">
@@ -56,7 +44,6 @@
             </div>
             <button type="button" class="btn-action add-btn" onclick="addFilmField()">+ เพิ่มม้วนฟิล์ม</button>
         </div>
-
         <div class="form-group">
             <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (ถ้าสะดวก)</label>
             <input type="file" id="filmFile" accept="image/*" capture="camera">
@@ -65,59 +52,42 @@
             <label>หมายเหตุ (Note ถึงช่าง)</label>
             <textarea id="note" rows="2" placeholder="เช่น ขอติดขอบดำ / push +1"></textarea>
         </div>
-        
         <button type="submit" id="submitBtn">SEND ORDER</button>
-        
         <a href="index.html" class="track-link-btn">ตรวจสอบสถานะการล้างฟิล์ม</a>
     </form>
-
     <div id="successBox">
         <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
         <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
-        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงินนะครับ</p>
-        
-        <a href="https://www.facebook.com/profile.php?id=61575451919271" target="_blank" class="fb-btn">
-           ไปที่เพจ Facebook เพื่อแจ้งโอน
-        </a>
-
+        <p style="font-size: 14px;">กรุณาทักแชทแจ้งโอนเงินที่เพจนะครับ</p>
+        <a href="https://www.facebook.com/profile.php?id=61575451919271" target="_blank" class="fb-btn">ไปที่เพจ Facebook เพื่อแจ้งโอน</a>
         <a href="index.html" class="track-link-btn" style="background: transparent; color: #4a453f; border-color: #4a453f;">ไปที่หน้าเช็กสถานะฟิล์ม</a>
     </div>
 </div>
-
 <script>
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
         const div = document.createElement('div');
         div.className = 'film-entry';
-        div.innerHTML = `
-            <input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required>
-            <button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>
-        `;
+        div.innerHTML = `<input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required>
+            <button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>`;
         filmList.appendChild(div);
     }
-
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
-
     document.getElementById('orderForm').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = "SENDING...";
-
         const filmInputs = document.getElementsByClassName('film-name');
         let filmDetails = "";
-        for (let i = 0; i < filmInputs.length; i++) {
-            filmDetails += `${i + 1}. ${filmInputs[i].value}\n`;
-        }
-
+        for (let i = 0; i < filmInputs.length; i++) { filmDetails += `${i + 1}. ${filmInputs[i].value}\n`; }
         const toBase64 = file => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
             reader.onerror = error => reject(error);
         });
-
         const filmFile = document.getElementById('filmFile').files[0];
         const payload = {
             orderId: document.getElementById('orderId').value,
@@ -125,28 +95,19 @@
             note: document.getElementById('note').value,
             filmFile: filmFile ? await toBase64(filmFile) : null
         };
-
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
             const result = await response.json();
-            
             if (result.result === 'success') {
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
             } else if (result.result === 'duplicate') {
                 alert('❌ ' + result.message);
-                btn.disabled = false;
-                btn.innerText = "SEND ORDER";
-            } else {
-                throw new Error(result.error);
-            }
+                btn.disabled = false; btn.innerText = "SEND ORDER";
+            } else { throw new Error(result.error); }
         } catch (err) {
             alert('เกิดข้อผิดพลาด กรุณาทักแชทแจ้งนัทโดยตรงนะครับ');
-            btn.disabled = false;
-            btn.innerText = "SEND ORDER";
+            btn.disabled = false; btn.innerText = "SEND ORDER";
         }
     };
 </script>
