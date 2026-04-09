@@ -14,14 +14,17 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
+        
         .film-entry { display: flex; gap: 8px; align-items: center; }
         .btn-action { padding: 10px 15px; cursor: pointer; font-family: 'Special Elite'; font-size: 14px; border: none; transition: 0.3s; }
         .add-btn { background: #5a554f; color: white; width: 100%; margin-bottom: 20px; }
         .remove-btn { background: #a34b4b; color: white; height: 45px; margin-bottom: 10px; }
+
         button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 18px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; margin-top: 10px; }
         button:disabled { background: #ccc; cursor: not-allowed; }
+        
         #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
-        .chat-btn { background: #0084ff; color: white; padding: 15px; text-decoration: none; display: block; margin-top: 15px; font-weight: bold; border-radius: 5px; }
+        .chat-btn { background: #1877F2; color: white; padding: 15px; text-decoration: none; display: block; margin-top: 15px; font-weight: bold; border-radius: 5px; font-family: 'Sarabun'; }
     </style>
 </head>
 <body>
@@ -65,13 +68,18 @@
     <div id="successBox">
         <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
         <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
-        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงิน<br>และส่งสลิปโอนเงินทางเพจ Facebook นะครับ</p>
-        <a href="https://m.me/61575451919271" target="_blank" class="chat-btn">ทักแชทแจ้งโอนเงิน (Messenger)</a>
+        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงินนะครับ</p>
+        <p style="font-size: 13px; color: #666; margin-top: 10px;">
+           กรุณาแจ้งโอนเงินที่เพจ Facebook:<br>
+           <strong>The Analog Nomad - ช่างภาพ</strong>
+        </p>
+        <a href="https://www.facebook.com/profile.php?id=61575451919271" target="_blank" class="chat-btn">
+           ไปที่เพจ Facebook เพื่อแจ้งโอน
+        </a>
     </div>
 </div>
 
 <script>
-    // ฟังก์ชันเพิ่มช่องกรอกฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
@@ -84,7 +92,6 @@
         filmList.appendChild(div);
     }
 
-    // ลิงก์ Web App ของนัท
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
     document.getElementById('orderForm').onsubmit = async (e) => {
@@ -93,7 +100,6 @@
         btn.disabled = true;
         btn.innerText = "SENDING...";
 
-        // รวมชื่อฟิล์มทุกช่องเข้าด้วยกัน แยกบรรทัดใหม่
         const filmInputs = document.getElementsByClassName('film-name');
         let filmDetails = "";
         for (let i = 0; i < filmInputs.length; i++) {
@@ -120,14 +126,12 @@
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
-            
             const result = await response.json();
             
             if (result.result === 'success') {
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
             } else if (result.result === 'duplicate') {
-                // แจ้งเตือนถ้าเลข Order ID ซ้ำ
                 alert('❌ ' + result.message);
                 btn.disabled = false;
                 btn.innerText = "SEND ORDER";
@@ -135,8 +139,7 @@
                 throw new Error(result.error);
             }
         } catch (err) {
-            console.error(err);
-            alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง หรือทักแชทแจ้งนัทโดยตรงครับ');
+            alert('เกิดข้อผิดพลาด กรุณาทักแชทแจ้งนัทโดยตรงนะครับ');
             btn.disabled = false;
             btn.innerText = "SEND ORDER";
         }
