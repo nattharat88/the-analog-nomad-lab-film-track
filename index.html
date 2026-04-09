@@ -80,7 +80,7 @@
     <div class="footer">© 2026 THE ANALOG NOMAD LAB.</div>
 
     <script>
-        // *** แก้ลิงก์ CSV ตรงนี้ ***
+        // *** ใส่ลิงก์ CSV ของนัทตรงนี้ ***
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSyn18h4wHPHdv6qpdu_0n5rwiPqLrBB_TZMwi65PjyJo2M8RSmWi83iSUHsoXbjHVS4uXBdzgLYI1z/pubhtml?gid=369962220&single=true';
 
         async function trackOrder() {
@@ -91,28 +91,40 @@
             if (!orderId) return;
 
             try {
-                // เพิ่ม timestamp เพื่อป้องกัน cache ของ browser ทำให้ข้อมูลอัปเดตช้า
                 const response = await fetch(`${SHEET_URL}&t=${new Date().getTime()}`);
                 const data = await response.text();
                 
-                // ฟังก์ชันแยก CSV ที่รองรับข้อความที่มีเครื่องหมายคำพูด (พิมพ์หลายบรรทัด)
-                const rows = data.split(/\r?\n/).map(line => {
-                    const result = [];
-                    let cur = '', inQuote = false;
-                    for (let i = 0; i < line.length; i++) {
-                        if (line[i] === '"') inQuote = !inQuote;
-                        else if (line[i] === ',' && !inQuote) { result.push(cur); cur = ''; }
-                        else cur += line[i];
+                // ฟังก์ชันพิเศษสำหรับอ่าน CSV ที่มี Alt+Enter (Newline inside quotes)
+                const parseCSV = (text) => {
+                    const rows = [];
+                    let row = [];
+                    let col = '';
+                    let inQuote = false;
+                    for (let i = 0; i < text.length; i++) {
+                        let char = text[i];
+                        let nextChar = text[i+1];
+                        if (char === '"' && inQuote && nextChar === '"') { col += '"'; i++; } 
+                        else if (char === '"') { inQuote = !inQuote; } 
+                        else if (char === ',' && !inQuote) { row.push(col); col = ''; } 
+                        else if ((char === '\r' || char === '\n') && !inQuote) {
+                            if (col !== '' || row.length > 0) {
+                                row.push(col);
+                                rows.push(row);
+                                row = [];
+                                col = '';
+                            }
+                        } else { col += char; }
                     }
-                    result.push(cur);
-                    return result;
-                });
+                    if (col !== '' || row.length > 0) { row.push(col); rows.push(row); }
+                    return rows;
+                };
 
-                const orderData = rows.find(row => row[0] && row[0].replace(/"/g, '').trim() === orderId);
+                const rows = parseCSV(data);
+                // ค้นหาโดยลบช่องว่างและล้างค่าขยะ
+                const orderData = rows.find(row => row[0] && row[0].trim() === orderId);
 
                 if (orderData) {
-                    // ล้างเครื่องหมายคำพูดที่ติดมาจาก CSV และจัดการข้อมูลว่างให้เป็น "-"
-                    const clean = (val) => (val && val.replace(/"/g, '').trim()) ? val.replace(/"/g, '').trim() : "-";
+                    const clean = (val) => (val && val.trim()) ? val.trim() : "-";
                     
                     document.getElementById('res-id').innerText = clean(orderData[0]);
                     document.getElementById('res-payment').innerText = clean(orderData[1]);
