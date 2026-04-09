@@ -3,148 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Order | The Analog Nomad</title>
+    <title>Track Status | The Analog Nomad</title>
     <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Sarabun:wght@300;400&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #d6d2c9;
-            --paper-color: #e8e4da;
-            --text-color: #4a453f;
-            --accent-color: #8c7863;
-            --border-color: #b5ada2;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Special Elite', 'Sarabun', monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
-        }
-
-        .container {
-            background: var(--paper-color);
-            padding: 40px;
-            border: 1px solid var(--border-color);
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h1 { font-size: 24px; margin-bottom: 30px; border-bottom: 2px solid var(--accent-color); display: inline-block; padding-bottom: 10px; }
-        .search-box { margin-bottom: 30px; }
-        input { background: transparent; border: none; border-bottom: 1px solid var(--accent-color); padding: 10px; font-family: 'Special Elite', monospace; font-size: 18px; text-align: center; width: 80%; outline: none; color: var(--text-color); }
-        button { background: var(--accent-color); color: white; border: none; padding: 10px 20px; margin-top: 20px; cursor: pointer; font-family: 'Special Elite', monospace; transition: 0.3s; }
-        button:hover { background: #6f5e4d; }
-
-        #result { margin-top: 30px; text-align: left; display: none; border-top: 1px dashed var(--border-color); padding-top: 20px; }
-        .status-item { margin-bottom: 15px; display: flex; flex-direction: column; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
-        .status-label { font-weight: bold; text-transform: uppercase; font-size: 13px; color: var(--accent-color); margin-bottom: 4px; }
-        .status-value { white-space: pre-wrap; font-size: 16px; line-height: 1.4; color: var(--text-color); }
-
-        #error { color: #a34b4b; display: none; font-size: 14px; margin-top: 20px; }
-        .footer { margin-top: 40px; font-size: 12px; opacity: 0.6; }
+        :root { --bg-color: #d6d2c9; --paper-color: #e8e4da; --text-color: #4a453f; --accent-color: #8c7863; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Special Elite', 'Sarabun', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png'); }
+        .container { background: var(--paper-color); padding: 30px; border: 1px solid #b5ada2; max-width: 450px; width: 100%; box-shadow: 10px 10px 0px rgba(0,0,0,0.05); }
+        h1 { font-size: 22px; text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 18px; text-align: center; margin-bottom: 15px; }
+        button { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; }
+        #result { margin-top: 25px; padding: 15px; border: 1px solid var(--accent-color); display: none; background: white; text-align: left; }
+        .status-item { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; font-family: 'Sarabun'; line-height: 1.6; }
+        .track-btn { background: #4a453f; color: white; padding: 15px; text-decoration: none; display: block; text-align: center; margin-top: 20px; font-size: 16px; border: 1px solid #333; }
+        .file-link { color: #8c7863; font-weight: bold; text-decoration: underline; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>THE ANALOG NOMAD</h1>
-        <p style="font-size: 14px; margin-top: -20px;">— FILM TRACKING SYSTEM —</p>
-        
-        <div class="search-box">
-            <input type="text" id="orderInput" placeholder="ENTER ORDER NO.">
-            <br>
-            <button onclick="trackOrder()">SEARCH</button>
-        </div>
-
-        <div id="result">
-            <div class="status-item"><span class="status-label">Order Number:</span><span id="res-id" class="status-value"></span></div>
-            <div class="status-item"><span class="status-label">Film Details:</span><span id="res-film" class="status-value"></span></div>
-            <div class="status-item"><span class="status-label">Payment Status:</span><span id="res-payment" class="status-value"></span></div>
-            <div class="status-item"><span class="status-label">Developing:</span><span id="res-dev" class="status-value"></span></div>
-            <div class="status-item"><span class="status-label">Scanning:</span><span id="res-scan" class="status-value"></span></div>
-            <div class="status-item"><span class="status-label">Delivery:</span><span id="res-del" class="status-value"></span></div>
-        </div>
-        <p id="error">ไม่พบข้อมูลออเดอร์ กรุณาตรวจสอบเลขใหม่อีกครั้ง</p>
+<div class="container">
+    <h1>TRACK STATUS</h1>
+    <input type="text" id="orderIdInput" placeholder="กรอกเลข ORDER ID">
+    <button onclick="trackStatus()" id="checkBtn">CHECK STATUS</button>
+    <div id="result">
+        <div class="status-item"><strong>ฟิล์ม:</strong> <br><span id="resFilm"></span></div>
+        <div class="status-item"><strong>การชำระเงิน:</strong> <span id="resPayment"></span></div>
+        <div class="status-item"><strong>สถานะงาน:</strong> <span id="resStatus"></span></div>
+        <div class="status-item"><strong>ลิงก์ส่งไฟล์:</strong> <br><span id="resLink"></span></div>
+        <div class="status-item"><strong>เลขพัสดุ:</strong> <br><span id="resTrack"></span></div>
     </div>
-
-    <div class="footer">© 2026 THE ANALOG NOMAD LAB.</div>
-
-    <script>
-        // *** แก้ลิงก์เป็นแบบ CSV ให้แล้วครับ ***
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSyn18h4wHPHdv6qpdu_0n5rwiPqLrBB_TZMwi65PjyJo2M8RSmWi83iSUHsoXbjHVS4uXBdzgLYI1z/pub?gid=369962220&single=true&output=csv';
-
-        async function trackOrder() {
-            const orderId = document.getElementById('orderInput').value.trim();
-            const resultDiv = document.getElementById('result');
-            const errorP = document.getElementById('error');
-            
-            if (!orderId) return;
-
-            try {
-                const response = await fetch(`${SHEET_URL}&t=${new Date().getTime()}`);
-                const data = await response.text();
-                
-                const parseCSV = (text) => {
-                    const rows = [];
-                    let row = [];
-                    let col = '';
-                    let inQuote = false;
-                    for (let i = 0; i < text.length; i++) {
-                        let char = text[i];
-                        let nextChar = text[i+1];
-                        if (char === '"' && inQuote && nextChar === '"') { col += '"'; i++; } 
-                        else if (char === '"') { inQuote = !inQuote; } 
-                        else if (char === ',' && !inQuote) { row.push(col); col = ''; } 
-                        else if ((char === '\r' || char === '\n') && !inQuote) {
-                            if (col !== '' || row.length > 0) {
-                                row.push(col);
-                                rows.push(row);
-                                row = [];
-                                col = '';
-                            }
-                        } else { col += char; }
-                    }
-                    if (col !== '' || row.length > 0) { row.push(col); rows.push(row); }
-                    return rows;
-                };
-
-                const rows = parseCSV(data);
-                
-                // ปรับให้ค้นหาแบบไม่สนตัวพิมพ์เล็ก-ใหญ่ (toUpperCase)
-                const orderData = rows.find(row => 
-                    row[0] && row[0].trim().toUpperCase() === orderId.toUpperCase()
-                );
-
-                if (orderData) {
-                    const clean = (val) => (val && val.trim()) ? val.trim() : "-";
-                    
-                    document.getElementById('res-id').innerText = clean(orderData[0]);
-                    document.getElementById('res-payment').innerText = clean(orderData[1]);
-                    document.getElementById('res-film').innerText = clean(orderData[2]);
-                    document.getElementById('res-dev').innerText = clean(orderData[3]);
-                    document.getElementById('res-scan').innerText = clean(orderData[4]);
-                    document.getElementById('res-del').innerText = clean(orderData[5]);
-                    
-                    resultDiv.style.display = 'block';
-                    errorP.style.display = 'none';
+    <a href="order.html" class="track-btn" style="background: transparent; color: #4a453f; border: 1px solid #4a453f;">กลับไปหน้าสั่งล้างฟิล์ม (Order)</a>
+</div>
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
+    async function trackStatus() {
+        const id = document.getElementById('orderIdInput').value;
+        const btn = document.getElementById('checkBtn');
+        if(!id) return alert('กรุณากรอกเลข ID');
+        btn.innerText = "SEARCHING..."; btn.disabled = true;
+        document.getElementById('result').style.display = 'none';
+        try {
+            const response = await fetch(`${SCRIPT_URL}?id=${id}`);
+            const data = await response.json();
+            if(data.result === 'found') {
+                document.getElementById('resFilm').innerText = data.filmName;
+                document.getElementById('resPayment').innerText = data.payment;
+                document.getElementById('resStatus').innerText = data.status;
+                // แสดงลิงก์ส่งไฟล์
+                if (data.fileLink && data.fileLink.startsWith('http')) {
+                    document.getElementById('resLink').innerHTML = `<a href="${data.fileLink}" target="_blank" class="file-link">คลิกเพื่อโหลดรูปภาพ</a>`;
+                } else { document.getElementById('resLink').innerText = "กำลังดำเนินการ..."; }
+                // แสดงเลขพัสดุตามเงื่อนไข
+                const trackNo = data.trackingNo;
+                const trackEl = document.getElementById('resTrack');
+                if(!trackNo || trackNo.trim() === "") {
+                    trackEl.innerText = "รอส่งฟิล์ม Negative"; trackEl.style.color = "#a34b4b";
                 } else {
-                    resultDiv.style.display = 'none';
-                    errorP.style.display = 'block';
+                    trackEl.innerText = trackNo; trackEl.style.color = "green"; trackEl.style.fontWeight = "bold";
                 }
-            } catch (err) {
-                console.error("Error:", err);
-                alert("ระบบขัดข้อง กรุณาลองใหม่ภายหลัง");
-            }
-        }
-    </script>
+                document.getElementById('result').style.display = 'block';
+            } else { alert('ไม่พบข้อมูลเลข ID นี้ครับ'); }
+        } catch(e) { alert('เกิดข้อผิดพลาดในการดึงข้อมูล'); }
+        btn.innerText = "CHECK STATUS"; btn.disabled = false;
+    }
+</script>
 </body>
 </html>
