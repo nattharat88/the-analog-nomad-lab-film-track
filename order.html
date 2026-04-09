@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order | The Analog Nomad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Sarabun:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color: #d6d2c9; --paper-color: #e8e4da; --text-color: #4a453f; --accent-color: #8c7863; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Special Elite', 'Sarabun', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png'); }
+        .container { background: var(--paper-color); padding: 30px; border: 1px solid #b5ada2; max-width: 450px; width: 100%; box-shadow: 10px 10px 0px rgba(0,0,0,0.05); }
+        h1 { font-size: 22px; text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 5px; }
+        .price-tag { background: white; padding: 15px; border: 1px dashed var(--accent-color); margin-bottom: 20px; font-size: 14px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; }
+        button { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; transition: 0.3s; margin-top: 10px; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
+        .chat-btn { background: #4a453f; color: white; padding: 12px; text-decoration: none; display: block; margin-top: 15px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>THE ANALOG NOMAD</h1>
+    <p style="text-align: center; font-size: 11px; margin-top: -10px; margin-bottom: 20px;">— ORDER FORM —</p>
+
+    <div class="price-tag">
+        <strong>PRICE LIST:</strong><br>
+        • Color C-41 / ECN-2: 130.- / ม้วน<br>
+        • Black & White: 150.- / ม้วน<br>
+        • ค่าส่งเนกาทีฟกลับ: เริ่มต้น 30.-
+    </div>
+
+    <form id="orderForm">
+        <div class="form-group">
+            <label>ORDER ID (ดูจากเลขบนซองซิปล็อค)</label>
+            <input type="text" id="orderId" placeholder="เช่น A001" required>
+        </div>
+        <div class="form-group">
+            <label>ชื่อฟิล์ม / จำนวนม้วน</label>
+            <input type="text" id="filmName" placeholder="เช่น Kodak Gold 200 (2 ม้วน)" required>
+        </div>
+        <div class="form-group">
+            <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (ถ้าสะดวก)</label>
+            <input type="file" id="filmFile" accept="image/*" capture="camera">
+        </div>
+        <div class="form-group">
+            <label>หมายเหตุ (Note ถึงช่าง)</label>
+            <textarea id="note" rows="2" placeholder="เช่น ขอติดขอบดำ / ดึงสีโทนเย็น / push +1"></textarea>
+        </div>
+        <button type="submit" id="submitBtn">SEND ORDER</button>
+    </form>
+
+    <div id="successBox">
+        <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
+        <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
+        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงิน<br>และส่งสลิปโอนเงินทาง IG นะครับ</p>
+        <a href="https://ig.me/m/the.analog.nomad" class="chat-btn">CLICK TO CHAT (แจ้งโอนเงิน)</a>
+    </div>
+</div>
+
+<script>
+    // ลิงก์ Web App ของนัท
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
+
+    document.getElementById('orderForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = "SENDING...";
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        const filmFile = document.getElementById('filmFile').files[0];
+        const payload = {
+            orderId: document.getElementById('orderId').value,
+            filmName: document.getElementById('filmName').value,
+            note: document.getElementById('note').value,
+            filmFile: filmFile ? await toBase64(filmFile) : null
+        };
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await response.json();
+            
+            if (result.result === 'success') {
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('successBox').style.display = 'block';
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง หรือทักแชทโดยตรงครับ');
+            btn.disabled = false;
+            btn.innerText = "SEND ORDER";
+        }
+    };
+</script>
+</body>
+</html>
