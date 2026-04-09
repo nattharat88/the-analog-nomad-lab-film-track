@@ -71,6 +71,7 @@
 </div>
 
 <script>
+    // ฟังก์ชันเพิ่มช่องกรอกฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
@@ -83,6 +84,7 @@
         filmList.appendChild(div);
     }
 
+    // ลิงก์ Web App ของนัท
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
     document.getElementById('orderForm').onsubmit = async (e) => {
@@ -91,6 +93,7 @@
         btn.disabled = true;
         btn.innerText = "SENDING...";
 
+        // รวมชื่อฟิล์มทุกช่องเข้าด้วยกัน แยกบรรทัดใหม่
         const filmInputs = document.getElementsByClassName('film-name');
         let filmDetails = "";
         for (let i = 0; i < filmInputs.length; i++) {
@@ -117,15 +120,23 @@
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
+            
             const result = await response.json();
+            
             if (result.result === 'success') {
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
+            } else if (result.result === 'duplicate') {
+                // แจ้งเตือนถ้าเลข Order ID ซ้ำ
+                alert('❌ ' + result.message);
+                btn.disabled = false;
+                btn.innerText = "SEND ORDER";
             } else {
                 throw new Error(result.error);
             }
         } catch (err) {
-            alert('เกิดข้อผิดพลาด กรุณาทักแชทแจ้งนัทโดยตรงนะครับ');
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง หรือทักแชทแจ้งนัทโดยตรงครับ');
             btn.disabled = false;
             btn.innerText = "SEND ORDER";
         }
