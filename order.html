@@ -13,17 +13,18 @@
         .price-tag { background: white; padding: 15px; border: 1px dashed var(--accent-color); margin-bottom: 20px; font-size: 14px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
         
-        /* สไตล์สำหรับช่องเพิ่มฟิล์ม */
-        .film-entry { display: flex; gap: 5px; margin-bottom: 8px; }
-        .add-btn { background: #5a554f; color: white; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Special Elite'; font-size: 14px; margin-bottom: 15px; }
-        .remove-btn { background: #a34b4b; color: white; border: none; padding: 0 10px; cursor: pointer; }
+        /* สไตล์ปุ่มเพิ่มม้วนฟิล์ม */
+        .film-entry { display: flex; gap: 8px; align-items: center; }
+        .btn-action { padding: 10px 15px; cursor: pointer; font-family: 'Special Elite'; font-size: 14px; border: none; transition: 0.3s; }
+        .add-btn { background: #5a554f; color: white; width: 100%; margin-bottom: 20px; }
+        .remove-btn { background: #a34b4b; color: white; height: 45px; margin-bottom: 10px; }
 
-        button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; transition: 0.3s; margin-top: 10px; }
+        button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 18px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; margin-top: 10px; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
-        .chat-btn { background: #4a453f; color: white; padding: 12px; text-decoration: none; display: block; margin-top: 15px; font-size: 14px; }
+        .chat-btn { background: #4a453f; color: white; padding: 12px; text-decoration: none; display: block; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -49,10 +50,10 @@
             <label>ชื่อฟิล์ม (ระบุทีละม้วน)</label>
             <div id="filmList">
                 <div class="film-entry">
-                    <input type="text" class="film-name" placeholder="ม้วนที่ 1: เช่น Kodak Gold 200" required>
+                    <input type="text" class="film-name" placeholder="ม้วนที่ 1: ชื่อฟิล์ม" required>
                 </div>
             </div>
-            <button type="button" class="add-btn" onclick="addFilmField()">+ เพิ่มม้วนฟิล์ม</button>
+            <button type="button" class="btn-action add-btn" onclick="addFilmField()">+ เพิ่มม้วนฟิล์ม</button>
         </div>
 
         <div class="form-group">
@@ -82,8 +83,8 @@
         const div = document.createElement('div');
         div.className = 'film-entry';
         div.innerHTML = `
-            <input type="text" class="film-name" placeholder="ม้วนที่ ${count}: เช่น Fuji C200" required>
-            <button type="button" class="remove-btn" onclick="this.parentElement.remove()">X</button>
+            <input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required>
+            <button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>
         `;
         filmList.appendChild(div);
     }
@@ -96,7 +97,7 @@
         btn.disabled = true;
         btn.innerText = "SENDING...";
 
-        // รวมชื่อฟิล์มทุกช่องเข้าด้วยกัน แยกด้วยบรรทัดใหม่
+        // รวมชื่อฟิล์มทุกช่องเข้าด้วยกัน แยกบรรทัดใหม่
         const filmInputs = document.getElementsByClassName('film-name');
         let filmDetails = "";
         for (let i = 0; i < filmInputs.length; i++) {
@@ -113,7 +114,7 @@
         const filmFile = document.getElementById('filmFile').files[0];
         const payload = {
             orderId: document.getElementById('orderId').value,
-            filmName: filmDetails.trim(), // ส่งข้อมูลที่รวมกันและขึ้นบรรทัดใหม่แล้ว
+            filmName: filmDetails.trim(),
             note: document.getElementById('note').value,
             filmFile: filmFile ? await toBase64(filmFile) : null
         };
@@ -131,7 +132,7 @@
                 throw new Error(result.error);
             }
         } catch (err) {
-            alert('เกิดข้อผิดพลาด กรุณาลองใหม่ครับ');
+            alert('เกิดข้อผิดพลาด กรุณาทักแชทแจ้งนัทโดยตรงนะครับ');
             btn.disabled = false;
             btn.innerText = "SEND ORDER";
         }
