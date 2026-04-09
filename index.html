@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Sarabun:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #d6d2c9; /* เทาน้ำตาลซีด */
+            --bg-color: #d6d2c9;
             --paper-color: #e8e4da;
             --text-color: #4a453f;
             --accent-color: #8c7863;
@@ -25,7 +25,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png'); /* เพิ่ม Texture กระดาษเก่า */
+            background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
         }
 
         .container {
@@ -38,125 +38,50 @@
             text-align: center;
         }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 2px solid var(--accent-color);
-            display: inline-block;
-            padding-bottom: 10px;
-        }
+        h1 { font-size: 24px; margin-bottom: 30px; border-bottom: 2px solid var(--accent-color); display: inline-block; padding-bottom: 10px; }
+        .search-box { margin-bottom: 30px; }
+        input { background: transparent; border: none; border-bottom: 1px solid var(--accent-color); padding: 10px; font-family: 'Special Elite', monospace; font-size: 18px; text-align: center; width: 80%; outline: none; color: var(--text-color); }
+        button { background: var(--accent-color); color: white; border: none; padding: 10px 20px; margin-top: 20px; cursor: pointer; font-family: 'Special Elite', monospace; transition: 0.3s; }
+        button:hover { background: #6f5e4d; }
 
-        .search-box {
-            margin-bottom: 30px;
-        }
+        #result { margin-top: 30px; text-align: left; display: none; border-top: 1px dashed var(--border-color); padding-top: 20px; }
+        .status-item { margin-bottom: 15px; display: flex; flex-direction: column; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
+        .status-label { font-weight: bold; text-transform: uppercase; font-size: 13px; color: var(--accent-color); margin-bottom: 4px; }
+        /* ทำให้รองรับการขึ้นบรรทัดใหม่ตาม Sheet */
+        .status-value { white-space: pre-wrap; font-size: 16px; line-height: 1.4; color: var(--text-color); }
 
-        input {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--accent-color);
-            padding: 10px;
-            font-family: 'Special Elite', monospace;
-            font-size: 18px;
-            text-align: center;
-            outline: none;
-            width: 80%;
-            color: var(--text-color);
-        }
-
-        button {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-            font-family: 'Special Elite', monospace;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #6f5e4d;
-        }
-
-        #result {
-            margin-top: 30px;
-            text-align: left;
-            display: none;
-            border-top: 1px dashed var(--border-color);
-            padding-top: 20px;
-        }
-
-        .status-item {
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .status-label { font-weight: bold; text-transform: uppercase; font-size: 14px; }
-        .status-value { color: #6b5a4a; }
-
-        .footer {
-            margin-top: 40px;
-            font-size: 12px;
-            opacity: 0.6;
-        }
-
-        /* สำหรับหน้าจอเล็ก */
-        @media (max-width: 480px) {
-            .container { padding: 20px; }
-        }
+        #error { color: #a34b4b; display: none; font-size: 14px; margin-top: 20px; }
+        .footer { margin-top: 40px; font-size: 12px; opacity: 0.6; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>The Analog Nomad</h1>
-        <p style="font-size: 14px;">— FILM TRACKING SYSTEM —</p>
+        <h1>THE ANALOG NOMAD</h1>
+        <p style="font-size: 14px; margin-top: -20px;">— FILM TRACKING SYSTEM —</p>
         
         <div class="search-box">
-            <input type="text" id="orderInput" placeholder="ENTER ORDER NO. (e.g. 001)">
+            <input type="text" id="orderInput" placeholder="ENTER ORDER NO.">
             <br>
             <button onclick="trackOrder()">SEARCH</button>
         </div>
 
         <div id="result">
-            <div class="status-item">
-                <span class="status-label">Order Number:</span>
-                <span id="res-id" class="status-value">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Film:</span>
-                <span id="res-film" class="status-value">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Payment:</span>
-                <span id="res-payment" class="status-value">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Developing:</span>
-                <span id="res-dev" class="status-value">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Scanning:</span>
-                <span id="res-scan" class="status-value">-</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Delivery:</span>
-                <span id="res-del" class="status-value">-</span>
-            </div>
+            <div class="status-item"><span class="status-label">Order Number:</span><span id="res-id" class="status-value"></span></div>
+            <div class="status-item"><span class="status-label">Film Details:</span><span id="res-film" class="status-value"></span></div>
+            <div class="status-item"><span class="status-label">Payment Status:</span><span id="res-payment" class="status-value"></span></div>
+            <div class="status-item"><span class="status-label">Developing:</span><span id="res-dev" class="status-value"></span></div>
+            <div class="status-item"><span class="status-label">Scanning:</span><span id="res-scan" class="status-value"></span></div>
+            <div class="status-item"><span class="status-label">Delivery:</span><span id="res-del" class="status-value"></span></div>
         </div>
-
-        <p id="error" style="color: #a34b4b; display: none; font-size: 14px;">Order not found. Please check your ID.</p>
+        <p id="error">ไม่พบข้อมูลออเดอร์ กรุณาตรวจสอบเลขใหม่อีกครั้ง</p>
     </div>
 
-    <div class="footer">
-        © 2026 THE ANALOG NOMAD LAB.
-    </div>
+    <div class="footer">© 2026 THE ANALOG NOMAD LAB.</div>
 
     <script>
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSyn18h4wHPHdv6qpdu_0n5rwiPqLrBB_TZMwi65PjyJo2M8RSmWi83iSUHsoXbjHVS4uXBdzgLYI1z/pub?gid=369962220&single=true&output=csv';
+        // *** แก้ลิงก์ CSV ตรงนี้ ***
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSyn18h4wHPHdv6qpdu_0n5rwiPqLrBB_TZMwi65PjyJo2M8RSmWi83iSUHsoXbjHVS4uXBdzgLYI1z/pubhtml?gid=369962220&single=true';
 
         async function trackOrder() {
             const orderId = document.getElementById('orderInput').value.trim();
@@ -166,20 +91,35 @@
             if (!orderId) return;
 
             try {
-                const response = await fetch(SHEET_URL);
+                // เพิ่ม timestamp เพื่อป้องกัน cache ของ browser ทำให้ข้อมูลอัปเดตช้า
+                const response = await fetch(`${SHEET_URL}&t=${new Date().getTime()}`);
                 const data = await response.text();
-                const rows = data.split('\n').map(row => row.split(','));
+                
+                // ฟังก์ชันแยก CSV ที่รองรับข้อความที่มีเครื่องหมายคำพูด (พิมพ์หลายบรรทัด)
+                const rows = data.split(/\r?\n/).map(line => {
+                    const result = [];
+                    let cur = '', inQuote = false;
+                    for (let i = 0; i < line.length; i++) {
+                        if (line[i] === '"') inQuote = !inQuote;
+                        else if (line[i] === ',' && !inQuote) { result.push(cur); cur = ''; }
+                        else cur += line[i];
+                    }
+                    result.push(cur);
+                    return result;
+                });
 
-                // ค้นหาแถวที่มี OrderNumber ตรงกับที่ลูกค้ากรอก
-                const orderData = rows.find(row => row[0].trim() === orderId);
+                const orderData = rows.find(row => row[0] && row[0].replace(/"/g, '').trim() === orderId);
 
                 if (orderData) {
-                    document.getElementById('res-id').innerText = orderData[0];
-                    document.getElementById('res-payment').innerText = orderData[1];
-                    document.getElementById('res-film').innerText = orderData[2];
-                    document.getElementById('res-dev').innerText = orderData[3];
-                    document.getElementById('res-scan').innerText = orderData[4];
-                    document.getElementById('res-del').innerText = orderData[5];
+                    // ล้างเครื่องหมายคำพูดที่ติดมาจาก CSV และจัดการข้อมูลว่างให้เป็น "-"
+                    const clean = (val) => (val && val.replace(/"/g, '').trim()) ? val.replace(/"/g, '').trim() : "-";
+                    
+                    document.getElementById('res-id').innerText = clean(orderData[0]);
+                    document.getElementById('res-payment').innerText = clean(orderData[1]);
+                    document.getElementById('res-film').innerText = clean(orderData[2]);
+                    document.getElementById('res-dev').innerText = clean(orderData[3]);
+                    document.getElementById('res-scan').innerText = clean(orderData[4]);
+                    document.getElementById('res-del').innerText = clean(orderData[5]);
                     
                     resultDiv.style.display = 'block';
                     errorP.style.display = 'none';
@@ -188,7 +128,7 @@
                     errorP.style.display = 'block';
                 }
             } catch (err) {
-                console.error("Error fetching data:", err);
+                console.error("Error:", err);
                 alert("ระบบขัดข้อง กรุณาลองใหม่ภายหลัง");
             }
         }
