@@ -14,7 +14,13 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
         input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; }
-        button { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; transition: 0.3s; margin-top: 10px; }
+        
+        /* สไตล์สำหรับช่องเพิ่มฟิล์ม */
+        .film-entry { display: flex; gap: 5px; margin-bottom: 8px; }
+        .add-btn { background: #5a554f; color: white; border: none; padding: 5px 15px; cursor: pointer; font-family: 'Special Elite'; font-size: 14px; margin-bottom: 15px; }
+        .remove-btn { background: #a34b4b; color: white; border: none; padding: 0 10px; cursor: pointer; }
+
+        button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; transition: 0.3s; margin-top: 10px; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
         .chat-btn { background: #4a453f; color: white; padding: 12px; text-decoration: none; display: block; margin-top: 15px; font-size: 14px; }
@@ -38,17 +44,24 @@
             <label>ORDER ID (ดูจากเลขบนซองซิปล็อค)</label>
             <input type="text" id="orderId" placeholder="เช่น A001" required>
         </div>
+
         <div class="form-group">
-            <label>ชื่อฟิล์ม / จำนวนม้วน</label>
-            <input type="text" id="filmName" placeholder="เช่น Kodak Gold 200 (2 ม้วน)" required>
+            <label>ชื่อฟิล์ม (ระบุทีละม้วน)</label>
+            <div id="filmList">
+                <div class="film-entry">
+                    <input type="text" class="film-name" placeholder="ม้วนที่ 1: เช่น Kodak Gold 200" required>
+                </div>
+            </div>
+            <button type="button" class="add-btn" onclick="addFilmField()">+ เพิ่มม้วนฟิล์ม</button>
         </div>
+
         <div class="form-group">
             <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (ถ้าสะดวก)</label>
             <input type="file" id="filmFile" accept="image/*" capture="camera">
         </div>
         <div class="form-group">
             <label>หมายเหตุ (Note ถึงช่าง)</label>
-            <textarea id="note" rows="2" placeholder="เช่น ขอติดขอบดำ / ดึงสีโทนเย็น / push +1"></textarea>
+            <textarea id="note" rows="2" placeholder="เช่น ขอติดขอบดำ / push +1"></textarea>
         </div>
         <button type="submit" id="submitBtn">SEND ORDER</button>
     </form>
@@ -56,13 +69,25 @@
     <div id="successBox">
         <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
         <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
-        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงิน<br>และส่งสลิปโอนเงินทาง IG นะครับ</p>
+        <p style="font-size: 14px;">กรุณาทักแชทเพื่อสรุปยอดชำระเงินนะครับ</p>
         <a href="https://ig.me/m/the.analog.nomad" class="chat-btn">CLICK TO CHAT (แจ้งโอนเงิน)</a>
     </div>
 </div>
 
 <script>
-    // ลิงก์ Web App ของนัท
+    // ฟังก์ชันเพิ่มช่องกรอกฟิล์ม
+    function addFilmField() {
+        const filmList = document.getElementById('filmList');
+        const count = filmList.getElementsByClassName('film-entry').length + 1;
+        const div = document.createElement('div');
+        div.className = 'film-entry';
+        div.innerHTML = `
+            <input type="text" class="film-name" placeholder="ม้วนที่ ${count}: เช่น Fuji C200" required>
+            <button type="button" class="remove-btn" onclick="this.parentElement.remove()">X</button>
+        `;
+        filmList.appendChild(div);
+    }
+
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
     document.getElementById('orderForm').onsubmit = async (e) => {
@@ -70,6 +95,13 @@
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = "SENDING...";
+
+        // รวมชื่อฟิล์มทุกช่องเข้าด้วยกัน แยกด้วยบรรทัดใหม่
+        const filmInputs = document.getElementsByClassName('film-name');
+        let filmDetails = "";
+        for (let i = 0; i < filmInputs.length; i++) {
+            filmDetails += `${i + 1}. ${filmInputs[i].value}\n`;
+        }
 
         const toBase64 = file => new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -81,7 +113,7 @@
         const filmFile = document.getElementById('filmFile').files[0];
         const payload = {
             orderId: document.getElementById('orderId').value,
-            filmName: document.getElementById('filmName').value,
+            filmName: filmDetails.trim(), // ส่งข้อมูลที่รวมกันและขึ้นบรรทัดใหม่แล้ว
             note: document.getElementById('note').value,
             filmFile: filmFile ? await toBase64(filmFile) : null
         };
@@ -91,9 +123,7 @@
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
-            
             const result = await response.json();
-            
             if (result.result === 'success') {
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
@@ -101,8 +131,7 @@
                 throw new Error(result.error);
             }
         } catch (err) {
-            console.error(err);
-            alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง หรือทักแชทโดยตรงครับ');
+            alert('เกิดข้อผิดพลาด กรุณาลองใหม่ครับ');
             btn.disabled = false;
             btn.innerText = "SEND ORDER";
         }
