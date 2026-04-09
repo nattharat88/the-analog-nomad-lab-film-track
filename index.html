@@ -47,7 +47,6 @@
         #result { margin-top: 30px; text-align: left; display: none; border-top: 1px dashed var(--border-color); padding-top: 20px; }
         .status-item { margin-bottom: 15px; display: flex; flex-direction: column; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
         .status-label { font-weight: bold; text-transform: uppercase; font-size: 13px; color: var(--accent-color); margin-bottom: 4px; }
-        /* ทำให้รองรับการขึ้นบรรทัดใหม่ตาม Sheet */
         .status-value { white-space: pre-wrap; font-size: 16px; line-height: 1.4; color: var(--text-color); }
 
         #error { color: #a34b4b; display: none; font-size: 14px; margin-top: 20px; }
@@ -80,8 +79,8 @@
     <div class="footer">© 2026 THE ANALOG NOMAD LAB.</div>
 
     <script>
-        // *** ใส่ลิงก์ CSV ของนัทตรงนี้ ***
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSyn18h4wHPHdv6qpdu_0n5rwiPqLrBB_TZMwi65PjyJo2M8RSmWi83iSUHsoXbjHVS4uXBdzgLYI1z/pubhtml?gid=369962220&single=true';
+        // *** แก้ลิงก์เป็นแบบ CSV ให้แล้วครับ ***
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSyn18h4wHPHdv6qpdu_0n5rwiPqLrBB_TZMwi65PjyJo2M8RSmWi83iSUHsoXbjHVS4uXBdzgLYI1z/pub?gid=369962220&single=true&output=csv';
 
         async function trackOrder() {
             const orderId = document.getElementById('orderInput').value.trim();
@@ -94,7 +93,6 @@
                 const response = await fetch(`${SHEET_URL}&t=${new Date().getTime()}`);
                 const data = await response.text();
                 
-                // ฟังก์ชันพิเศษสำหรับอ่าน CSV ที่มี Alt+Enter (Newline inside quotes)
                 const parseCSV = (text) => {
                     const rows = [];
                     let row = [];
@@ -120,8 +118,11 @@
                 };
 
                 const rows = parseCSV(data);
-                // ค้นหาโดยลบช่องว่างและล้างค่าขยะ
-                const orderData = rows.find(row => row[0] && row[0].trim() === orderId);
+                
+                // ปรับให้ค้นหาแบบไม่สนตัวพิมพ์เล็ก-ใหญ่ (toUpperCase)
+                const orderData = rows.find(row => 
+                    row[0] && row[0].trim().toUpperCase() === orderId.toUpperCase()
+                );
 
                 if (orderData) {
                     const clean = (val) => (val && val.trim()) ? val.trim() : "-";
