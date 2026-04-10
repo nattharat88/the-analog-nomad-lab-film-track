@@ -16,6 +16,11 @@
         .status-item { margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; font-family: 'Sarabun'; line-height: 1.6; }
         .track-btn { background: #4a453f; color: white; padding: 15px; text-decoration: none; display: block; text-align: center; margin-top: 20px; font-size: 16px; border: 1px solid #333; }
         .file-link { color: #8c7863; font-weight: bold; text-decoration: underline; }
+        
+        /* สีกำกับสถานะงาน */
+        .status-waiting { color: #e67e22; font-weight: bold; } /* สีส้ม */
+        .status-scanning { color: #3498db; font-weight: bold; } /* สีฟ้า */
+        .status-completed { color: #27ae60; font-weight: bold; } /* สีเขียว */
     </style>
 </head>
 <body>
@@ -33,25 +38,39 @@
     <a href="order.html" class="track-btn" style="background: transparent; color: #4a453f; border: 1px solid #4a453f;">กลับไปหน้าสั่งล้างฟิล์ม (Order)</a>
 </div>
 <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
+    const SCRIPT_URL = 'เอา_WEB_APP_URL_ใหม่มาวางตรงนี้';
+
     async function trackStatus() {
         const id = document.getElementById('orderIdInput').value;
         const btn = document.getElementById('checkBtn');
         if(!id) return alert('กรุณากรอกเลข ID');
         btn.innerText = "SEARCHING..."; btn.disabled = true;
         document.getElementById('result').style.display = 'none';
+        
         try {
             const response = await fetch(`${SCRIPT_URL}?id=${id}`);
             const data = await response.json();
             if(data.result === 'found') {
                 document.getElementById('resFilm').innerText = data.filmName;
-                document.getElementById('resPayment').innerText = data.payment;
-                document.getElementById('resStatus').innerText = data.status;
+                
+                // แสดงสถานะการชำระเงิน
+                const payEl = document.getElementById('resPayment');
+                payEl.innerText = data.payment;
+                payEl.style.color = data.payment === "Paid" ? "green" : "#a34b4b";
+
+                // แสดงสถานะงานพร้อมปรับสีตามข้อความ
+                const statEl = document.getElementById('resStatus');
+                statEl.innerText = data.status;
+                if(data.status === "Waiting for Pickup") statEl.className = "status-waiting";
+                else if(data.status === "Scanning") statEl.className = "status-scanning";
+                else if(data.status === "Completed") statEl.className = "status-completed";
+
                 // แสดงลิงก์ส่งไฟล์
                 if (data.fileLink && data.fileLink.startsWith('http')) {
                     document.getElementById('resLink').innerHTML = `<a href="${data.fileLink}" target="_blank" class="file-link">คลิกเพื่อโหลดรูปภาพ</a>`;
                 } else { document.getElementById('resLink').innerText = "กำลังดำเนินการ..."; }
-                // แสดงเลขพัสดุตามเงื่อนไข
+
+                // แสดงเลขพัสดุ
                 const trackNo = data.trackingNo;
                 const trackEl = document.getElementById('resTrack');
                 if(!trackNo || trackNo.trim() === "") {
