@@ -10,7 +10,10 @@
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Special Elite', 'Sarabun', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png'); }
         .container { background: var(--paper-color); padding: 30px; border: 1px solid #b5ada2; max-width: 450px; width: 100%; box-shadow: 10px 10px 0px rgba(0,0,0,0.05); }
         h1 { font-size: 20px; text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 5px; }
-        .price-tag { background: white; padding: 15px; border: 1px dashed var(--accent-color); margin-bottom: 20px; font-size: 14px; }
+        
+        .price-tag { background: white; padding: 15px; border: 1px dashed var(--accent-color); margin-bottom: 20px; font-size: 13px; line-height: 1.5; }
+        .price-item { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
@@ -36,8 +39,9 @@
     <p style="text-align: center; font-size: 11px; margin-top: -10px; margin-bottom: 20px;">— ORDER FORM —</p>
 
     <div class="price-tag">
-        <strong>PRICE LIST:</strong><br>
-        (กำลังปรับปรุงราคาเร็วๆ นี้ครับ)
+        <div class="price-item"><span>C-41 (Color Film)</span> <span>100 THB</span></div>
+        <div class="price-item"><span>ECN-2 / Black & White</span> <span>130 THB</span></div>
+        <div style="font-size: 11px; color: #999; margin-top: 5px;">*Hi-Res Scan: Coming Soon</div>
     </div>
 
     <form id="orderForm">
@@ -47,22 +51,22 @@
         </div>
 
         <div class="form-group">
-            <label>ชื่อฟิล์ม (ระบุทีละม้วน)</label>
+            <label>ชื่อฟิล์ม (Film Name)<br><span style="font-weight: normal; font-size: 11px;">*หากไม่รู้จักชื่อฟิล์มพิมพ์ว่า unknown</span></label>
             <div id="filmList">
                 <div class="film-entry">
                     <input type="text" class="film-name" placeholder="ม้วนที่ 1: ชื่อฟิล์ม" required>
                 </div>
             </div>
-            <button type="button" class="btn-action add-btn" onclick="addFilmField()">+ เพิ่มม้วนฟิล์ม</button>
+            <button type="button" class="btn-action add-btn" onclick="addFilmField()">+ เพิ่มม้วนฟิล์ม (Add rolls)</button>
         </div>
 
         <div class="form-group">
-            <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (ถ้าสะดวก)</label>
+            <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (Photo of film)</label>
             <input type="file" id="filmFile" accept="image/*" capture="camera">
         </div>
         <div class="form-group">
-            <label>หมายเหตุ (Note ถึงช่าง)</label>
-            <textarea id="note" rows="2" placeholder="เช่น ขอติดขอบดำ / push +1"></textarea>
+            <label>หมายเหตุ (Note)</label>
+            <textarea id="note" rows="2" placeholder="Push/Pull film?"></textarea>
         </div>
         <button type="submit" id="submitBtn">SEND ORDER</button>
         <a href="index.html" class="track-link-btn">ตรวจสอบสถานะการล้างฟิล์ม</a>
@@ -79,12 +83,8 @@
             📸 IG: @theanalognomadfilmlab
         </div>
 
-        <a href="https://www.facebook.com/profile.php?id=61575451919271" target="_blank" class="btn-link fb-color">
-           ทักแชท Facebook
-        </a>
-        <a href="https://www.instagram.com/theanalognomadfilmlab" target="_blank" class="btn-link ig-color">
-           ทักแชท Instagram
-        </a>
+        <a href="https://www.facebook.com/profile.php?id=61575451919271" target="_blank" class="btn-link fb-color">ทักแชท Facebook</a>
+        <a href="https://www.instagram.com/theanalognomadfilmlab" target="_blank" class="btn-link ig-color">ทักแชท Instagram</a>
         <a href="index.html" class="track-link-btn" style="background: transparent; color: #4a453f; border-color: #4a453f;">ไปที่หน้าเช็กสถานะฟิล์ม</a>
     </div>
 </div>
