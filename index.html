@@ -97,13 +97,19 @@
                 const s = data.status;
                 statEl.innerText = s;
 
-                if(s === "Waiting for pickup") statEl.className = "status-waiting";
-                else if(s === "Process") statEl.className = "status-process";
-                else if(s === "Scanning in progress") statEl.className = "status-scanning";
-                else if(s === "Done") statEl.className = "status-done";
-                else if(s === "Blank Roll / No Images") statEl.className = "status-blank";
-                else statEl.className = "";
-
+                if (s === "Waiting for Pickup") {
+                    statEl.className = "status-waiting";
+                } else if (s === "Processing") {
+                    statEl.className = "status-process";
+                } else if (s === "Scanning in Progress") {
+                    statEl.className = "status-scanning";
+                } else if (s === "Done") {
+                    statEl.className = "status-done";
+                } else if (s === "Blank Roll / No Images") {
+                    statEl.className = "status-blank";
+                } else {
+                    statEl.className = "";
+                    
                 const linkEl = document.getElementById('resLink');
                 if (data.fileLink && data.fileLink.trim() !== "") {
                     linkEl.innerHTML = `<a href="${data.fileLink}" target="_blank" class="file-link">Click to Download</a>`;
