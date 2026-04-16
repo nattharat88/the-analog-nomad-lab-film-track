@@ -17,7 +17,7 @@
         .status-item { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-family: 'Sarabun'; line-height: 1.6; }
         .label { font-weight: bold; font-size: 14px; color: var(--accent-color); display: block; margin-bottom: 4px; }
         
-        /* --- LAB STATUS COLORS (Customized) --- */
+        /* --- LAB STATUS COLORS --- */
         .status-waiting { background-color: #f4cccc; color: #990000; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
         .status-process { background-color: #fff2cc; color: #000000; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
         .status-scanning { background-color: #d9ead3; color: #38761d; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
@@ -92,16 +92,16 @@
                 payEl.innerText = data.payment;
                 payEl.className = data.payment === "Paid" ? "status-paid" : "status-unpaid";
 
-                // --- เช็กสถานะเป็นภาษาอังกฤษตาม Sheet ---
+                // --- เช็กสถานะ Lab Status ---
                 const statEl = document.getElementById('resStatus');
                 const s = data.status;
                 statEl.innerText = s;
 
-                if (s === "Waiting for Pickup") {
+                if (s === "Waiting for pickup") {
                     statEl.className = "status-waiting";
-                } else if (s === "Processing") {
+                } else if (s === "Process") {
                     statEl.className = "status-process";
-                } else if (s === "Scanning in Progress") {
+                } else if (s === "Scanning in progress") {
                     statEl.className = "status-scanning";
                 } else if (s === "Done") {
                     statEl.className = "status-done";
@@ -109,24 +109,31 @@
                     statEl.className = "status-blank";
                 } else {
                     statEl.className = "";
-                    
+                }
+
+                // --- เช็กไฟล์ลิงก์ ---
                 const linkEl = document.getElementById('resLink');
                 if (data.fileLink && data.fileLink.trim() !== "") {
                     linkEl.innerHTML = `<a href="${data.fileLink}" target="_blank" class="file-link">Click to Download</a>`;
+                    linkEl.className = ""; 
                 } else { 
                     linkEl.innerText = "Processing..."; 
                     linkEl.className = "waiting-text";
                 }
 
+                // --- เช็กเลขพัสดุ ---
                 const trackEl = document.getElementById('resTrack');
                 if(data.trackingNo && data.trackingNo.trim() !== "") {
                     trackEl.innerText = data.trackingNo;
                     trackEl.style.color = "#38761d";
                     trackEl.style.fontWeight = "bold";
+                    trackEl.className = "";
                 } else {
                     trackEl.innerText = "Waiting for shipment";
                     trackEl.className = "waiting-text";
+                    trackEl.style.color = ""; 
                 }
+                
                 document.getElementById('result').style.display = 'block';
             } else { alert('Order ID not found.'); }
         } catch(e) { alert('Error connecting to system.'); }
