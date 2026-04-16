@@ -152,24 +152,29 @@
     }
 
     async function saveNote() {
-        const newNote = document.getElementById('noteTextarea').value;
-        const saveBtn = document.getElementById('saveBtn');
-        if(!confirm('Update note?')) return;
-        saveBtn.innerText = "SAVING..."; saveBtn.disabled = true;
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ orderId: currentOrderId, newNote: newNote })
-            });
-            const res = await response.json();
-            if(res.result === "success") {
-                alert("Note updated!");
-                document.getElementById('resNote').innerText = newNote || "No note";
-                toggleEdit();
-            } else { alert("Failed."); }
-        } catch(e) { alert("Error."); }
-        saveBtn.innerText = "SAVE CHANGES"; saveBtn.disabled = false;
-    }
+    const newNote = document.getElementById('noteTextarea').value;
+    const saveBtn = document.getElementById('saveBtn');
+    if(!confirm('Update note?')) return;
+    saveBtn.innerText = "SAVING..."; saveBtn.disabled = true;
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // เพิ่ม Header กันพัง
+            body: JSON.stringify({ 
+                action: "updateNote", // บอก Apps Script ว่าให้อัปเดต Note
+                orderId: currentOrderId, 
+                newNote: newNote 
+            })
+        });
+        const res = await response.json();
+        if(res.result === "success") {
+            alert("Note updated!");
+            document.getElementById('resNote').innerText = newNote || "No note";
+            toggleEdit();
+        } else { alert("Failed."); }
+    } catch(e) { alert("Error."); }
+    saveBtn.innerText = "SAVE CHANGES"; saveBtn.disabled = false;
+}
 </script>
 </body>
 </html>
