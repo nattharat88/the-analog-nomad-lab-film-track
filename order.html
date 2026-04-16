@@ -91,63 +91,43 @@
 </div>
 
 <script>
-    function addFilmField() {
-        const filmList = document.getElementById('filmList');
-        const count = filmList.getElementsByClassName('film-entry').length + 1;
-        const div = document.createElement('div');
-        div.className = 'film-entry';
-        div.innerHTML = `<input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required>
-            <button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>`;
-        filmList.appendChild(div);
-    }
-
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
-    document.getElementById('orderForm').onsubmit = async (e) => {
-        e.preventDefault();
+    async function submitOrder() {
         const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
+        const orderId = document.getElementById('orderId').value;
+        const filmName = document.getElementById('filmName').value;
+        const note = document.getElementById('note').value;
+
+        if (!filmName) return alert('กรุณากรอกชื่อฟิล์มด้วยครับ');
+
         btn.innerText = "SENDING...";
-
-        const filmInputs = document.getElementsByClassName('film-name');
-        let filmDetails = "";
-        for (let i = 0; i < filmInputs.length; i++) {
-            filmDetails += `${i + 1}. ${filmInputs[i].value}\n`;
-        }
-
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-
-        const filmFile = document.getElementById('filmFile').files[0];
-        const payload = {
-            orderId: document.getElementById('orderId').value,
-            filmName: filmDetails.trim(),
-            note: document.getElementById('note').value,
-            filmFile: filmFile ? await toBase64(filmFile) : null
-        };
+        btn.disabled = true;
 
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    orderId: orderId,
+                    filmName: filmName,
+                    note: note
+                })
             });
+
             const result = await response.json();
             if (result.result === 'success') {
-                document.getElementById('orderForm').style.display = 'none';
-                document.getElementById('successBox').style.display = 'block';
-            } else if (result.result === 'duplicate') {
-                alert('❌ ' + result.message);
-                btn.disabled = false; btn.innerText = "SEND ORDER";
-            } else { throw new Error(result.error); }
-        } catch (err) {
-            alert('เกิดข้อผิดพลาด กรุณาทักแชทแจ้งนัทโดยตรงนะครับ');
-            btn.disabled = false; btn.innerText = "SEND ORDER";
+                alert('ส่งข้อมูลเรียบร้อย! เลข Order ของคุณคือ: ' + orderId);
+                location.reload(); 
+            } else {
+                alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+            }
+        } catch (e) {
+            alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+        } finally {
+            btn.innerText = "SUBMIT ORDER";
+            btn.disabled = false;
         }
-    };
+    } 
 </script>
 </body>
 </html>
