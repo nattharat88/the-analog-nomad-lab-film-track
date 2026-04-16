@@ -39,7 +39,6 @@
         <div class="price-item"><span>ฟิล์มสี (Color Film C-41)</span> <span>100 THB</span></div>
         <div class="price-item"><span>ฟิล์มบูด/Expired Film</span> <span>130 THB</span></div>
         <div class="price-item"><span>ฟิล์มหนัง (ECN-2) / Black & White Film</span> <span>130 THB</span></div>
-        <div style="font-size: 11px; color: #999; margin-top: 6px;">*Hi-Res Scan & .TIFF Format: Coming Soon</div>
     </div>
 
     <form id="orderForm">
@@ -49,7 +48,7 @@
         </div>
 
         <div class="form-group">
-            <label>ชื่อฟิล์ม (Film Name)<br><span style="font-weight: normal; font-size: 11px;">*หากไม่รู้จักชื่อฟิล์มพิมพ์ว่า unknown</span></label>
+            <label>ชื่อฟิล์ม (Film Name)</label>
             <div id="filmList">
                 <div class="film-entry">
                     <input type="text" class="film-name" placeholder="ม้วนที่ 1: ชื่อฟิล์ม" required>
@@ -59,9 +58,15 @@
         </div>
 
         <div class="form-group">
+            <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (Photo of Order No.)</label>
+            <input type="file" id="filmFile" accept="image/*" capture="camera">
+        </div>
+
+        <div class="form-group">
             <label>หมายเหตุ (Note, Special Request)</label>
             <textarea id="note" rows="2" placeholder="Push/Pull film?"></textarea>
         </div>
+
         <button type="submit" id="submitBtn">SEND ORDER</button>
         <a href="index.html" class="track-link-btn">ตรวจสอบสถานะการล้างฟิล์ม</a>
     </form>
@@ -84,7 +89,6 @@
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
-    // 1. ฟังก์ชันเพิ่มม้วนฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
@@ -97,47 +101,62 @@
         filmList.appendChild(newEntry);
     }
 
-    // 2. ส่งข้อมูลเมื่อกดปุ่ม SEND ORDER
-    document.getElementById('orderForm').addEventListener('submit', async function(e) {
-        e.preventDefault(); // ป้องกันการรีเฟรชหน้าจอ
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
         
         const btn = document.getElementById('submitBtn');
+        const fileInput = document.getElementById('filmFile');
+        const file = fileInput.files[0];
+        
         const orderId = document.getElementById('orderId').value;
         const note = document.getElementById('note').value;
-        
-        // รวบรวมชื่อฟิล์มจากทุกม้วนที่กรอก
         const filmInputs = document.querySelectorAll('.film-name');
-        let filmNames = Array.from(filmInputs).map(input => input.value).filter(val => val !== "").join(', ');
+        const filmNames = Array.from(filmInputs).map(input => input.value).filter(val => val !== "").join(', ');
 
         btn.innerText = "SENDING...";
         btn.disabled = true;
 
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                // ใช้ text/plain เพื่อเลี่ยงปัญหา CORS ในบางเบราว์เซอร์ของมือถือ
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    orderId: orderId,
-                    filmName: filmNames,
-                    note: note
-                })
-            });
+        // ถ้ามีไฟล์รูปภาพ ให้แปลงเป็น Base64 แล้วส่ง
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                sendData(base64Data, file.name, file.type);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            sendData(null, null, null);
+        }
 
-            const result = await response.json();
-            if (result.result === 'success') {
-                document.getElementById('orderForm').style.display = 'none';
-                document.getElementById('successBox').style.display = 'block';
-                window.scrollTo(0, 0);
-            } else {
+        async function sendData(base64, fileName, mimeType) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        filmName: filmNames,
+                        note: note,
+                        fileData: base64, // ส่งไปที่ Google Drive ผ่าน Apps Script
+                        fileName: fileName,
+                        mimeType: mimeType
+                    })
+                });
+
+                const result = await response.json();
+                if (result.result === 'success') {
+                    document.getElementById('orderForm').style.display = 'none';
+                    document.getElementById('successBox').style.display = 'block';
+                    window.scrollTo(0, 0);
+                } else {
+                    alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+                }
+            } catch (err) {
                 alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+            } finally {
+                btn.innerText = "SEND ORDER";
+                btn.disabled = false;
             }
-        } catch (e) {
-            alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
-            console.error(e);
-        } finally {
-            btn.innerText = "SEND ORDER";
-            btn.disabled = false;
         }
     });
 </script>
