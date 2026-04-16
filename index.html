@@ -89,6 +89,7 @@
                 payEl.innerText = data.payment;
                 payEl.className = data.payment === "Paid" ? "status-paid" : "status-unpaid";
 
+                // --- Lab Status Logic ---
                 const statEl = document.getElementById('resStatus');
                 const s = data.status;
                 statEl.innerText = s;
@@ -107,6 +108,7 @@
                     statEl.className = "";
                 }
 
+                // --- File Link Logic ---
                 const linkEl = document.getElementById('resLink');
                 if (data.fileLink && data.fileLink.trim() !== "") {
                     linkEl.innerHTML = `<a href="${data.fileLink}" target="_blank" class="file-link">Click to Download</a>`;
@@ -116,6 +118,7 @@
                     linkEl.className = "waiting-text";
                 }
 
+                // --- Tracking Logic ---
                 const trackEl = document.getElementById('resTrack');
                 if(data.trackingNo && data.trackingNo.trim() !== "") {
                     trackEl.innerText = data.trackingNo;
