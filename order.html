@@ -93,13 +93,30 @@
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
-    async function submitOrder() {
+    // 1. ฟังก์ชันเพิ่มม้วนฟิล์ม (ต้องมีเพื่อให้ปุ่ม + ทำงาน)
+    function addFilmField() {
+        const filmList = document.getElementById('filmList');
+        const count = filmList.getElementsByClassName('film-entry').length + 1;
+        const newEntry = document.createElement('div');
+        newEntry.className = 'film-entry';
+        newEntry.innerHTML = `
+            <input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required>
+            <button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>
+        `;
+        filmList.appendChild(newEntry);
+    }
+
+    // 2. ตัวดักจับตอนกดปุ่มส่ง (Submit)
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // กันหน้าจอปัดรีเฟรชเอง
+        
         const btn = document.getElementById('submitBtn');
         const orderId = document.getElementById('orderId').value;
-        const filmName = document.getElementById('filmName').value;
         const note = document.getElementById('note').value;
-
-        if (!filmName) return alert('กรุณากรอกชื่อฟิล์มด้วยครับ');
+        
+        // รวบรวมชื่อฟิล์มจากทุกม้วนที่กรอก
+        const filmInputs = document.querySelectorAll('.film-name');
+        let filmNames = Array.from(filmInputs).map(input => input.value).join(', ');
 
         btn.innerText = "SENDING...";
         btn.disabled = true;
@@ -109,25 +126,27 @@
                 method: 'POST',
                 body: JSON.stringify({
                     orderId: orderId,
-                    filmName: filmName,
+                    filmName: filmNames,
                     note: note
                 })
             });
 
             const result = await response.json();
             if (result.result === 'success') {
-                alert('ส่งข้อมูลเรียบร้อย! เลข Order ของคุณคือ: ' + orderId);
-                location.reload(); 
+                // ซ่อนฟอร์มและโชว์กล่อง Success ที่นัททำไว้
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('successBox').style.display = 'block';
+                window.scrollTo(0, 0);
             } else {
                 alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
             }
         } catch (e) {
             alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
         } finally {
-            btn.innerText = "SUBMIT ORDER";
+            btn.innerText = "SEND ORDER";
             btn.disabled = false;
         }
-    } 
+    });
 </script>
 </body>
 </html>
