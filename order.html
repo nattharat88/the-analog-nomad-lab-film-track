@@ -113,11 +113,18 @@
             });
 
             const result = await response.json();
+            
             if (result.result === 'success') {
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
                 window.scrollTo(0, 0);
-            } else {
+            } 
+            // ส่วนที่เสริมเข้าไป: ตรวจสอบกรณีเลขออเดอร์ซ้ำ
+            else if (result.result === 'duplicate') {
+                alert(result.message);
+                document.getElementById('orderId').focus();
+            } 
+            else {
                 alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
             }
         } catch (err) {
