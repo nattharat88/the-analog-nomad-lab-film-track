@@ -10,10 +10,8 @@
         body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Special Elite', 'Sarabun', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png'); }
         .container { background: var(--paper-color); padding: 30px; border: 1px solid #b5ada2; max-width: 450px; width: 100%; box-shadow: 10px 10px 0px rgba(0,0,0,0.05); }
         h1 { font-size: 20px; text-align: center; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px; margin-bottom: 5px; }
-        
         .price-tag { background: white; padding: 15px; border: 1px dashed var(--accent-color); margin-bottom: 20px; font-size: 13px; line-height: 1.5; }
         .price-item { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
-        
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: var(--accent-color); }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; background: rgba(255,255,255,0.5); font-family: 'Sarabun'; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
@@ -23,7 +21,6 @@
         .remove-btn { background: #a34b4b; color: white; height: 45px; margin-bottom: 10px; }
         button#submitBtn { background: var(--accent-color); color: white; border: none; padding: 18px; width: 100%; cursor: pointer; font-family: 'Special Elite'; font-size: 18px; margin-top: 10px; }
         button:disabled { background: #ccc; cursor: not-allowed; }
-        
         #successBox { display: none; text-align: center; background: #fdfdfd; padding: 20px; border: 2px solid var(--accent-color); margin-top: 20px; }
         .contact-info { text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid var(--accent-color); margin: 15px 0; font-size: 14px; line-height: 1.6; }
         .btn-link { color: white; padding: 12px; text-decoration: none; display: block; margin-top: 10px; font-weight: bold; border-radius: 5px; font-family: 'Sarabun'; font-size: 14px; }
@@ -62,11 +59,7 @@
         </div>
 
         <div class="form-group">
-            <label>ถ่ายรูปหน้าซอง หรือ ตัวฟิล์ม (Photo of Order No.)</label>
-            <input type="file" id="filmFile" accept="image/*" capture="camera">
-        </div>
-        <div class="form-group">
-            <label>หมายเหตุ (Note, Special Request,)</label>
+            <label>หมายเหตุ (Note, Special Request)</label>
             <textarea id="note" rows="2" placeholder="Push/Pull film?"></textarea>
         </div>
         <button type="submit" id="submitBtn">SEND ORDER</button>
@@ -76,14 +69,12 @@
     <div id="successBox">
         <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
         <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
-        
         <div class="contact-info">
             <strong>แจ้งโอนเงินและสอบถามข้อมูล:</strong><br>
             📞 นัท: 061-502-8800, 081-751-0678<br>
             🔵 FB: The Analog Nomad<br>
             📸 IG: @theanalognomadfilmlab
         </div>
-
         <a href="https://www.facebook.com/profile.php?id=61575451919271" target="_blank" class="btn-link fb-color">ทักแชท Facebook</a>
         <a href="https://www.instagram.com/theanalognomadfilmlab" target="_blank" class="btn-link ig-color">ทักแชท Instagram</a>
         <a href="index.html" class="track-link-btn" style="background: transparent; color: #4a453f; border-color: #4a453f;">ไปที่หน้าเช็กสถานะฟิล์ม</a>
@@ -93,7 +84,7 @@
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
-    // 1. ฟังก์ชันเพิ่มม้วนฟิล์ม (ต้องมีเพื่อให้ปุ่ม + ทำงาน)
+    // 1. ฟังก์ชันเพิ่มม้วนฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
@@ -106,9 +97,9 @@
         filmList.appendChild(newEntry);
     }
 
-    // 2. ตัวดักจับตอนกดปุ่มส่ง (Submit)
+    // 2. ส่งข้อมูลเมื่อกดปุ่ม SEND ORDER
     document.getElementById('orderForm').addEventListener('submit', async function(e) {
-        e.preventDefault(); // กันหน้าจอปัดรีเฟรชเอง
+        e.preventDefault(); // ป้องกันการรีเฟรชหน้าจอ
         
         const btn = document.getElementById('submitBtn');
         const orderId = document.getElementById('orderId').value;
@@ -116,7 +107,7 @@
         
         // รวบรวมชื่อฟิล์มจากทุกม้วนที่กรอก
         const filmInputs = document.querySelectorAll('.film-name');
-        let filmNames = Array.from(filmInputs).map(input => input.value).join(', ');
+        let filmNames = Array.from(filmInputs).map(input => input.value).filter(val => val !== "").join(', ');
 
         btn.innerText = "SENDING...";
         btn.disabled = true;
@@ -124,6 +115,8 @@
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
+                // ใช้ text/plain เพื่อเลี่ยงปัญหา CORS ในบางเบราว์เซอร์ของมือถือ
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
                     orderId: orderId,
                     filmName: filmNames,
@@ -133,7 +126,6 @@
 
             const result = await response.json();
             if (result.result === 'success') {
-                // ซ่อนฟอร์มและโชว์กล่อง Success ที่นัททำไว้
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
                 window.scrollTo(0, 0);
@@ -142,6 +134,7 @@
             }
         } catch (e) {
             alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+            console.error(e);
         } finally {
             btn.innerText = "SEND ORDER";
             btn.disabled = false;
