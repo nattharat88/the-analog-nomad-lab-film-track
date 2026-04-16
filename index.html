@@ -17,11 +17,12 @@
         .status-item { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-family: 'Sarabun'; line-height: 1.6; }
         .label { font-weight: bold; font-size: 14px; color: var(--accent-color); display: block; margin-bottom: 4px; }
         
-        .status-waiting { background-color: #f4cccc; color: #990000; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
-        .status-process { background-color: #fff2cc; color: #000000; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
-        .status-scanning { background-color: #d9ead3; color: #38761d; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
-        .status-done { background-color: #cfe2f3; color: #0b5394; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
-        .status-blank { background-color: #000000; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; } 
+        /* แก้ไข/เพิ่มเติม CSS สีตาม Google Sheet */
+        .status-waiting { background-color: #f4cccc; color: #990000; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 14px; } 
+        .status-process { background-color: #fff2cc; color: #b45f06; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 14px; } 
+        .status-scanning { background-color: #d9ead3; color: #38761d; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 14px; } 
+        .status-done { background-color: #cfe2f3; color: #0b5394; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 14px; } 
+        .status-blank { background-color: #434343; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 14px; } 
 
         .status-paid { color: #38761d; font-weight: bold; }
         .status-unpaid { color: #a34b4b; font-weight: bold; }
@@ -89,16 +90,17 @@
                 payEl.innerText = data.payment;
                 payEl.className = data.payment === "Paid" ? "status-paid" : "status-unpaid";
 
-                // --- Lab Status Logic ---
+                // --- Lab Status Logic (ปรับปรุงให้ตรงกับ Sheet) ---
                 const statEl = document.getElementById('resStatus');
-                const s = data.status;
+                const s = data.status; // รับค่าจาก Sheet
                 statEl.innerText = s;
 
-                if (s === "Waiting for pickup") {
+                // ตรวจสอบสถานะและใส่ Class (ระวังเรื่องตัวพิมพ์ใหญ่-เล็กให้ตรงกับใน Sheet)
+                if (s === "Waiting for Pickup") {
                     statEl.className = "status-waiting";
-                } else if (s === "Process") {
+                } else if (s === "Processing") {
                     statEl.className = "status-process";
-                } else if (s === "Scanning in progress") {
+                } else if (s === "Scanning In Progress") {
                     statEl.className = "status-scanning";
                 } else if (s === "Done") {
                     statEl.className = "status-done";
@@ -110,7 +112,7 @@
 
                 // --- File Link Logic ---
                 const linkEl = document.getElementById('resLink');
-                if (data.fileLink && data.fileLink.trim() !== "") {
+                if (data.fileLink && data.fileLink.trim() !== "" && data.fileLink !== "-") {
                     linkEl.innerHTML = `<a href="${data.fileLink}" target="_blank" class="file-link">Click to Download</a>`;
                     linkEl.className = "";
                 } else { 
@@ -120,7 +122,7 @@
 
                 // --- Tracking Logic ---
                 const trackEl = document.getElementById('resTrack');
-                if(data.trackingNo && data.trackingNo.trim() !== "") {
+                if(data.trackingNo && data.trackingNo.trim() !== "" && data.trackingNo !== "-") {
                     trackEl.innerText = data.trackingNo;
                     trackEl.style.color = "#38761d";
                     trackEl.style.fontWeight = "bold";
