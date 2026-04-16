@@ -89,15 +89,20 @@
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
+    // ฟังก์ชันเพิ่มม้วนฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
         const newEntry = document.createElement('div');
         newEntry.className = 'film-entry';
-        newEntry.innerHTML = `<input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required><button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>`;
+        newEntry.innerHTML = `
+            <input type="text" class="film-name" placeholder="ม้วนที่ ${count}: ชื่อฟิล์ม" required>
+            <button type="button" class="btn-action remove-btn" onclick="this.parentElement.remove()">X</button>
+        `;
         filmList.appendChild(newEntry);
     }
 
+    // ฟังก์ชันส่งข้อมูลไปยัง Google Apps Script
     async function sendToSheet(payload) {
         const btn = document.getElementById('submitBtn');
         try {
@@ -106,33 +111,45 @@
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             });
+
             const result = await response.json();
             if (result.result === 'success') {
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
                 window.scrollTo(0, 0);
-            } else if (result.result === 'duplicate') {
-                alert('❌ เลข Order ID นี้ซ้ำ! กรุณาตรวจสอบเลขหน้าซองอีกครั้ง');
-            } else { alert('เกิดข้อผิดพลาด กรุณาลองใหม่ครับ'); }
-        } catch (err) { alert('เกิดข้อผิดพลาด กรุณาลองใหม่ครับ'); }
-        finally { btn.innerText = "SEND ORDER"; btn.disabled = false; }
+            } else {
+                alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+            }
+        } catch (err) {
+            alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+        } finally {
+            btn.innerText = "SEND ORDER";
+            btn.disabled = false;
+        }
     }
 
+    // ดักจับเหตุการณ์ Submit
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
-        const file = document.getElementById('filmFile').files[0];
+        const fileInput = document.getElementById('filmFile');
+        const file = fileInput.files[0];
+        
+        const orderId = document.getElementById('orderId').value;
+        const note = document.getElementById('note').value;
         const filmInputs = document.querySelectorAll('.film-name');
         const filmNames = Array.from(filmInputs).map(i => i.value).filter(v => v !== "").join(', ');
 
-        btn.innerText = "SENDING..."; btn.disabled = true;
+        btn.innerText = "SENDING...";
+        btn.disabled = true;
 
         const payload = {
-            action: "createOrder", // บอก Apps Script ว่าให้สร้างออเดอร์
-            orderId: document.getElementById('orderId').value,
+            orderId: orderId,
             filmName: filmNames,
-            note: document.getElementById('note').value,
-            fileData: null, fileName: null, mimeType: null
+            note: note,
+            fileData: null,
+            fileName: null,
+            mimeType: null
         };
 
         if (file) {
@@ -144,7 +161,9 @@
                 sendToSheet(payload);
             };
             reader.readAsDataURL(file);
-        } else { sendToSheet(payload); }
+        } else {
+            sendToSheet(payload);
+        }
     });
 </script>
 </body>
