@@ -89,6 +89,7 @@
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
+    // ฟังก์ชันเพิ่มม้วนฟิล์ม
     function addFilmField() {
         const filmList = document.getElementById('filmList');
         const count = filmList.getElementsByClassName('film-entry').length + 1;
@@ -101,9 +102,35 @@
         filmList.appendChild(newEntry);
     }
 
+    // ฟังก์ชันส่งข้อมูลไปยัง Google Apps Script
+    async function sendToSheet(payload) {
+        const btn = document.getElementById('submitBtn');
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            if (result.result === 'success') {
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('successBox').style.display = 'block';
+                window.scrollTo(0, 0);
+            } else {
+                alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+            }
+        } catch (err) {
+            alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
+        } finally {
+            btn.innerText = "SEND ORDER";
+            btn.disabled = false;
+        }
+    }
+
+    // ดักจับเหตุการณ์ Submit
     document.getElementById('orderForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const btn = document.getElementById('submitBtn');
         const fileInput = document.getElementById('filmFile');
         const file = fileInput.files[0];
@@ -111,52 +138,31 @@
         const orderId = document.getElementById('orderId').value;
         const note = document.getElementById('note').value;
         const filmInputs = document.querySelectorAll('.film-name');
-        const filmNames = Array.from(filmInputs).map(input => input.value).filter(val => val !== "").join(', ');
+        const filmNames = Array.from(filmInputs).map(i => i.value).filter(v => v !== "").join(', ');
 
         btn.innerText = "SENDING...";
         btn.disabled = true;
 
-        // ถ้ามีไฟล์รูปภาพ ให้แปลงเป็น Base64 แล้วส่ง
+        const payload = {
+            orderId: orderId,
+            filmName: filmNames,
+            note: note,
+            fileData: null,
+            fileName: null,
+            mimeType: null
+        };
+
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Data = e.target.result.split(',')[1];
-                sendData(base64Data, file.name, file.type);
+            reader.onload = function(event) {
+                payload.fileData = event.target.result.split(',')[1];
+                payload.fileName = file.name;
+                payload.mimeType = file.type;
+                sendToSheet(payload);
             };
             reader.readAsDataURL(file);
         } else {
-            sendData(null, null, null);
-        }
-
-        async function sendData(base64, fileName, mimeType) {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        orderId: orderId,
-                        filmName: filmNames,
-                        note: note,
-                        fileData: base64, // ส่งไปที่ Google Drive ผ่าน Apps Script
-                        fileName: fileName,
-                        mimeType: mimeType
-                    })
-                });
-
-                const result = await response.json();
-                if (result.result === 'success') {
-                    document.getElementById('orderForm').style.display = 'none';
-                    document.getElementById('successBox').style.display = 'block';
-                    window.scrollTo(0, 0);
-                } else {
-                    alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
-                }
-            } catch (err) {
-                alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง หรือทัก IG แจ้งโดยตรงได้เลยครับ');
-            } finally {
-                btn.innerText = "SEND ORDER";
-                btn.disabled = false;
-            }
+            sendToSheet(payload);
         }
     });
 </script>
