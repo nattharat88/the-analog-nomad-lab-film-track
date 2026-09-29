@@ -43,8 +43,12 @@
 
     <form id="orderForm">
         <div class="form-group">
-            <label>ORDER ID (ดูจากเลขบนซองซิปล็อค)</label>
-            <input type="text" id="orderId" placeholder="เช่น A001" required>
+            <label>ORDER ID (ดูจากเลขบนซอง หรือ กดสุ่มเลขสำหรับส่งไปรษณีย์)</label>
+            <div style="display: flex; gap: 8px; align-items: stretch;">
+                <input type="text" id="orderId" placeholder="เช่น 5R6T" required style="margin-bottom: 0; flex: 1;">
+                <button type="button" class="btn-action" style="background: var(--accent-color); color: white; border-radius: 4px; white-space: nowrap;" onclick="generateAndSetOrder()">สุ่มเลขออเดอร์</button>
+            </div>
+            <small style="color: #666; font-size: 11px; margin-top: 5px; display: block;">*สำหรับลูกค้าส่งปณ. กรณีกดปุ่มสุ่ม ให้เขียนเลขนี้ลงบนกล่องพัสดุหรือหน้าซองฟิล์มด้วยครับ</small>
         </div>
 
         <div class="form-group">
@@ -88,6 +92,29 @@
 
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
+
+    // ฟังก์ชันสุ่มเลขออเดอร์ (ตัวอักษร 2 ตัว ผสม ตัวเลข 2 ตัว)
+    function generateAndSetOrder() {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const numbers = "0123456789";
+        
+        let chars = [];
+        chars.push(letters.charAt(Math.floor(Math.random() * letters.length)));
+        chars.push(letters.charAt(Math.floor(Math.random() * letters.length)));
+        chars.push(numbers.charAt(Math.floor(Math.random() * numbers.length)));
+        chars.push(numbers.charAt(Math.floor(Math.random() * numbers.length)));
+        
+        for (let i = chars.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [chars[i], chars[j]] = [chars[j], chars[i]];
+        }
+        
+        const newOrderId = chars.join('');
+        document.getElementById('orderId').value = newOrderId;
+        
+        document.getElementById('orderId').style.backgroundColor = "#e8f5e9";
+        setTimeout(() => { document.getElementById('orderId').style.backgroundColor = "rgba(255,255,255,0.5)"; }, 1000);
+    }
 
     // ฟังก์ชันเพิ่มม้วนฟิล์ม
     function addFilmField() {
