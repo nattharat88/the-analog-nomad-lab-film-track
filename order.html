@@ -27,6 +27,12 @@
         .fb-color { background: var(--fb-blue); }
         .ig-color { background: var(--ig-pink); }
         .track-link-btn { background: #4a453f; color: white; padding: 15px; text-decoration: none; display: block; text-align: center; margin-top: 15px; font-size: 16px; border: 1px solid #333; }
+        
+        /* กล่องสรุปออเดอร์ที่เพิ่มใหม่ */
+        .summary-box { background: #fff; padding: 15px; border: 2px dashed var(--accent-color); margin-bottom: 15px; text-align: left; border-radius: 5px; }
+        .summary-box-title { text-align: center; margin-bottom: 10px; font-weight: bold; color: var(--accent-color); font-size: 16px; }
+        .summary-text { font-size: 14px; margin-bottom: 8px; line-height: 1.4; }
+        .highlight-id { font-size: 18px; color: #a34b4b; font-weight: bold; font-family: 'Special Elite', sans-serif; }
     </style>
 </head>
 <body>
@@ -68,7 +74,7 @@
 
         <div class="form-group">
             <label>หมายเหตุ (Note, Special Request)</label>
-            <textarea id="note" rows="2" placeholder="IG, Emailรับรูป, ที่อยู่ส่งกลับ, อื่นๆ ?"></textarea>
+            <textarea id="note" rows="2" placeholder="Push/Pull film?"></textarea>
         </div>
 
         <button type="submit" id="submitBtn">SEND ORDER</button>
@@ -78,6 +84,18 @@
     <div id="successBox">
         <h2 style="color: var(--accent-color); margin-top: 0;">SUCCESS!</h2>
         <p>ส่งข้อมูลออเดอร์เรียบร้อยแล้วครับ</p>
+        
+        <!-- ส่วนที่เพิ่มใหม่: กล่องสรุปออเดอร์ให้ลูกค้าดู -->
+        <div class="summary-box">
+            <div class="summary-box-title">รายการออเดอร์ของคุณ</div>
+            <div class="summary-text"><strong>ORDER ID:</strong> <span id="displayOrderId" class="highlight-id"></span></div>
+            <div class="summary-text"><strong>ชื่อฟิล์ม:</strong> <span id="displayFilmName"></span></div>
+            <div style="font-size: 12px; color: #a34b4b; text-align: center; margin-top: 15px; font-weight: bold;">
+                📸 แนะนำให้แคปหน้าจอนี้ไว้เป็นหลักฐานครับ
+            </div>
+        </div>
+        <!-- จบส่วนที่เพิ่มใหม่ -->
+
         <div class="contact-info">
             <strong>แจ้งโอนเงินและสอบถามข้อมูล:</strong><br>
             📞 นัท: 061-502-8800<br>
@@ -93,7 +111,7 @@
 <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwS6bBsIyuvbn6eCaTKLRhsB_Bz_9DwAKC9k84_vhPYeqWpy-vVJOb2ToSTzQDPLfr/exec';
 
-    // ฟังก์ชันสุ่มเลขออเดอร์ (ตัวอักษร 2 ตัว ผสม ตัวเลข 2 ตัว)
+    // ฟังก์ชันสุ่มเลขออเดอร์
     function generateAndSetOrder() {
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const numbers = "0123456789";
@@ -142,11 +160,15 @@
             const result = await response.json();
             
             if (result.result === 'success') {
+                // อัปเดตข้อมูลที่จะแสดงในหน้าจอ Success
+                document.getElementById('displayOrderId').innerText = payload.orderId;
+                document.getElementById('displayFilmName').innerText = payload.filmName;
+
+                // ซ่อนฟอร์ม และโชว์หน้า Success
                 document.getElementById('orderForm').style.display = 'none';
                 document.getElementById('successBox').style.display = 'block';
                 window.scrollTo(0, 0);
             } 
-            // ส่วนที่เสริมเข้าไป: ตรวจสอบกรณีเลขออเดอร์ซ้ำ
             else if (result.result === 'duplicate') {
                 alert(result.message);
                 document.getElementById('orderId').focus();
